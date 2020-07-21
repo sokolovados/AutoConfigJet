@@ -1,0 +1,157 @@
+!Device running configuration:
+!version V310R220
+!
+ no auth-degenerate
+!
+ username admin group administrators password $1$kijv$AVmRjh7IFjMOm5SsGsbZe.
+ username super group administrators password $1$kijv$AVmRjh7IFjMOm5SsGsbZe.
+ user privilege level administrators password $9$kijv$e7015e4ca31c3ae839aa564bc4b0f361
+ user privilege level operators password $9$kijv$e7015e4ca31c3ae839aa564bc4b0f361
+ user privilege level users password $9$kijv$e7015e4ca31c3ae839aa564bc4b0f361
+ user privilege level guests password $9$kijv$e7015e4ca31c3ae839aa564bc4b0f361
+!
+!
+ clock timezone KGN add 5:0
+!
+ hostname {{hostname}}
+!
+ management acl enable
+ management acl 10.96.9.0/24 telnet
+ management acl 10.96.9.0/24 snmp
+ management acl 10.96.9.0/24 ssh
+ management acl 10.96.9.0/24 tftp
+ management acl 10.222.0.0/18 telnet
+ management acl 10.222.0.0/18 snmp
+ management acl 10.222.0.0/18 ssh
+ management acl 10.222.0.0/18 tftp
+!
+ dhcp-snooping start
+!
+vlan {{ trunk_vlans.fiberhome| join(' ') }}
+!
+stp
+ stp mode rstp
+ stp transmit-limit 2
+ stp bpdu-guard enable
+ stp trap enable
+!
+interface vlan {{ mgmt_vlan }}
+ alias admin_vlan
+ ip address {{ ip.ip_mask }}
+interface vlan {{ user_vlan }}
+ alias net_{{user_vlan }}
+!
+ syslog server 10.222.50.233
+!
+ snmp location {{ hostname }}
+ snmp view all 1 included
+ snmp community $9$kijv$b24a966c33d31c6171a8d464aff2600c ro view all
+ snmp community $9$kijv$29b19b4953281891f6ed97677dd3d73f6e2638e4c6484e13 ro view all
+ snmp community $9$kijv$b24a966c33d31c614ec4c0ecc498a289 rw view all
+!
+ ntp
+ oncesync enable
+ client update-interval 4
+ stratum 3
+ ntp unicast-server 10.222.50.233 version 3
+!
+ aaa
+ tacacs-server tacacs ip-address 10.96.9.76 key KGN_TACACS
+ tacacs-server tacacs single-connection enable
+ tacacs-server tacacs timeout 5
+ server-group tacacs+ tacacs-server tacacs
+ aaa authentication login method m1 server-group tacacs+ local
+ aaa authentication  enable method m2 server-group tacacs+ local
+ aaa authorization  method m3 server-group tacacs+ local
+ aaa account login method m4 server-group tacacs+ local
+!
+ loop-check trap enable
+ loop-check mode port
+ loop-check recover-time 20
+!
+ lldp reinit-delay 5
+!
+line console 1
+ length 24
+ timeout 10 0
+ login authentication local
+ language english
+ no color
+line vty 1 5
+ length 24
+ no monitor
+ timeout 10 0
+ login authentication aaa method m1 auth-type pap
+ login account aaa method m4
+ enable authentication aaa method m2
+ login authorization aaa method m3
+ language english
+ no color
+!
+!
+{% for interface in range(1,24) %}
+interface gigaethernet 1/0/{{ interface }}
+ stp disable
+ no port hybrid vlan 1
+ port hybrid vlan {{ user_vlan }} untagged
+ port hybrid pvid {{ user_vlan }}
+ mac-limit 0 action drop
+ port-security enable
+ port-security maximum 5
+ dhcp-snooping enable
+ dhcp-snooping option82 enable
+ dhcp-snooping option82 circuit-id format common
+ dhcp-snooping check mac-address enable
+ dhcp-snooping check user-bind enable
+ loop-check enable
+ loop-check action shutdown
+ loop-check shutdown recover-time 100
+ join port-isolate group 1
+ storm-control multicast percent 5
+ storm-control broadcast percent 5
+ storm-control dlf percent 5
+!
+{%  endfor %}
+interface gigaethernet 1/0/24
+ stp disable
+ port link-type trunk
+ no port trunk allow-pass vlan 1
+ port trunk allow-pass vlan {{ trunk_vlans.fiberhome| join(' ') }}
+ dhcp-snooping enable
+ dhcp-snooping trust
+ lldp admin-status rx-tx
+ lldp notification enable
+ lldp management-address {{ ip.ip }} enable
+!
+
+{% for trunk_interface in range(1,3) %}
+interface xgigaethernet 1/1/{{ trunk_interface }}
+ stp disable
+ port link-type trunk
+ no port trunk allow-pass vlan 1
+ port trunk allow-pass vlan {{ trunk_vlans.fiberhome| join(' ') }}
+ dhcp-snooping enable
+ dhcp-snooping trust
+ lldp admin-status rx-tx
+ lldp notification enable
+ lldp management-address {{ ip.ip }} enable
+!
+{% endfor %}
+{% for trunk_interface in range(1,3) %}
+interface xgigaethernet 1/2/{{ trunk_interface }}
+ transceiver type 1000Base-X
+ stp disable
+ port link-type trunk
+ no port trunk allow-pass vlan 1
+ port trunk allow-pass vlan {{ trunk_vlans.fiberhome| join(' ') }}
+ dhcp-snooping enable
+ dhcp-snooping trust
+ lldp admin-status rx-tx
+ lldp notification enable
+ lldp management-address {{ ip.ip }} enable
+!
+{% endfor %}
+
+ ip route-static 0.0.0.0 0.0.0.0 {{ ip.default_gateway_first }}
+!
+!end

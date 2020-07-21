@@ -1,0 +1,114 @@
+!
+ no auth-degenerate
+!
+ username admin group administrators password $1$kijv$MUSfdK0O6TrfDAf6PlV7a0
+ username super group administrators password $1$kijv$MUSfdK0O6TrfDAf6PlV7a0
+ user privilege level administrators password $9$kijv$ce716bcbc8e82803eaceac245ee9a6fb
+ user privilege level operators password $9$kijv$ce716bcbc8e82803eaceac245ee9a6fb
+ user privilege level users password $9$kijv$ce716bcbc8e82803eaceac245ee9a6fb
+ user privilege level guests password $9$kijv$ce716bcbc8e82803eaceac245ee9a6fb
+!
+ hostname {{hostname}}
+!
+vlan {{ trunk_vlans.fiberhome| join(' ') }}
+!
+stp
+ stp mode rstp
+!
+interface vlan {{mgmt_vlan}}
+ ip address {{ip.ip_mask}}
+!
+ snmp location {{ hostname }}
+ snmp community $9$kijv$01208bcac6be14d87ac30aac24104bf8 ro view internet
+ snmp community $9$kijv$ce716bcbc8e82803eaceac245ee9a6fb rw view internet
+ snmp community $9$kijv$29b19b4953281891f6ed97677dd3d73f6e2638e4c6484e13 ro view internet
+!
+ ntp
+ client update-interval 4
+ stratum 4
+ ntp unicast-server 89.148.192.121 version 3
+!
+ aaa
+ tacacs-server tacacs+ ip-address 10.96.9.67 key PRM_TACACS
+ server-group tacacs+ tacacs-server tacacs+
+ aaa account login method account_login_tacacs+ server-group tacacs+ local
+ aaa authentication  enable method authentication_enable_tacacs+ server-group tacacs+ local
+ aaa authentication login method authentication_login_tacacs+ server-group tacacs+ local
+ aaa authorization  method authorization_tacacs+ server-group tacacs+ local
+!
+ loop-check mode port
+ loop-check recover-time 20
+!
+line console 1
+ length 24
+ timeout 180 0
+ login authentication local
+ language english
+ no color
+line vty 1 5
+ length 24
+ no monitor
+ timeout 180 0
+ login authentication aaa method account_login_tacacs+ auth-type pap
+ login account aaa method account_login_tacacs+
+ enable authentication aaa method authentication_enable_tacacs+
+ login authorization aaa method authorization_tacacs+
+ language english
+ no color
+!
+{% for i in range(1,24) %}
+interface gigaethernet 1/0/{{i}}
+ flow-control enable
+ stp disable
+ no port hybrid vlan 1
+ port hybrid vlan 289 tagged
+ port hybrid vlan {{ user_vlan }} untagged
+ port hybrid pvid {{ user_vlan }}
+ loop-check enable
+ loop-check action shutdown
+ loop-check shutdown recover-time 100
+ join port-isolate group 1
+ storm-control multicast 64kbps 64
+ storm-control broadcast 64kbps 64
+ storm-control dlf 64kbps 64
+!
+{% endfor %}
+interface xgigaethernet 1/1/1
+ mtu 9728
+ transceiver type 1000BASE-X
+ no port hybrid vlan 1
+ port hybrid vlan {{ trunk_vlans.fiberhome| join(',') }} tagged
+ lldp admin-status rx-tx
+ lldp notification enable
+ lldp management-address {{ ip.ip }} enable
+!
+interface xgigaethernet 1/1/2
+ mtu 9728
+ transceiver type 1000BASE-X
+ no port hybrid vlan 1
+ port hybrid vlan {{ trunk_vlans.fiberhome| join(',') }} tagged
+ lldp admin-status rx-tx
+ lldp notification enable
+ lldp management-address {{ ip.ip }} enable
+!
+interface xgigaethernet 1/2/1
+ mtu 9728
+ transceiver type 1000BASE-X
+ no port hybrid vlan 1
+ port hybrid vlan {{ trunk_vlans.fiberhome| join(',') }} tagged
+ lldp admin-status rx-tx
+ lldp notification enable
+ lldp management-address {{ ip.ip }} enable
+!
+interface xgigaethernet 1/2/2
+ mtu 9728
+ transceiver type 1000BASE-X
+ no port hybrid vlan 1
+ port hybrid vlan {{ trunk_vlans.fiberhome| join(',') }} tagged
+ lldp admin-status rx-tx
+ lldp notification enable
+ lldp management-address {{ ip.ip }} enable
+!
+ ip route-static 0.0.0.0 0.0.0.0 {{ ip.def_gateway_first }}
+!
+!end

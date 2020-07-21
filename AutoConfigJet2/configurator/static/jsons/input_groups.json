@@ -1,0 +1,48 @@
+{
+        "NNOV": {
+                "fields": {
+                        "msk": "MSK",
+                        "hostname": "Hostname",
+                        "ip_mask": "Ip/Mask",
+                        "user_vlan": "User Vlan",
+                        "mgmt_vlan": "Mgmt Vlan",
+                        "trunk_vlan": "Trunk Vlan"
+                },
+                "check_box": {
+                        "multicast_vlan": [
+                                "Multicast Vlan",
+                                "multicastCheckBox"
+                        ]
+                }
+        },
+        "KGN": {
+                "fields": {
+                        "msk": "MSK",
+                        "hostname": "Hostname",
+                        "ip_mask": "Ip/Mask",
+                        "user_vlan": "User Vlan",
+                        "mgmt_vlan": "Mgmt Vlan",
+                        "trunk_vlan": "Trunk Vlan"
+                },
+                "check_box": {
+                        "multicast_vlan": [
+                                "Multicast Vlan",
+                                "multicastCheckBox"
+                        ]
+                }
+        },
+                "SAR": {
+                "fields": {
+                        "msk": "MSK",
+                        "hostname": "Hostname",
+                        "ip_mask": "Ip/Mask",
+                        "user_vlan": "User Vlan"
+                },
+                "check_box": {
+                        "multicast_vlan": [
+                                "Multicast Vlan",
+                                "multicastCheckBox"
+                        ]
+                }
+        }
+}
