@@ -1,0 +1,92 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-6">
+    <h2>Для заполнения шаблонов:</h2>
+    <ul>
+        <li>
+            <h3>
+                <span class="text-success">IP</span>
+            </h3>
+                используется в формате ip.option ( например <span class="text-success">ip</span>.<span class="text-info">ip_mask</span> )
+            <ul>
+                <li><span class="text-info">ip</span>: <span class="text-warning">192.168.1.2</span></li>
+                <li><span class="text-info">ip_mask:</span> <span class="text-warning">192.168.1.2/24</span></li>
+                <li><span class="text-info">network:</span> <span class="text-warning">255.255.255.0</span></li>
+                <li><span class="text-info">def_gateway_last</span>: <span class="text-warning">192.168.1.254</span></li>
+                <li><span class="text-info">def_gateway_first:</span> <span class="text-warning">192.168.1.1</span></li>
+            </ul>
+        </li>
+        <li>
+            <h3>
+                <span class="text-success">trunk_vlans</span>
+            </h3>
+            имеет трехслойную структуру. Используется в формате <span class="text-success">trunk_vlans</span>.<span class="text-info">option</span>.<span class="text-primary">vendor_option</span>.
+            <ul>
+                <li><span class="text-info">Option :</span></li>
+                    <ol>
+                        <li><span class="text-info">all_vlans :</span><span class="text-warning"> включает в себя данные форм User,Mgmt,Trunk vlan</span></li>
+                        <li><span class="text-info">vlans_without_mgmt :</span><span class="text-warning">включает в себя данные форм User,Trunk vlan</span></li>
+                        <li><span class="text-info">vlans_without_mgmt_user :</span><span class="text-warning">включает в себя данные форм Trunk vlan</span></li>
+                    </ol>
+                <li><span class="text-primary">Vendor option :</li>
+                    <ol>
+                        <li><span class="text-info">dlink :</span><span class="text-warning"> возвращает запись вида '1-3,4,5' в формате ['1', '2', '3', '4', '5'] </span></li>
+                        <li><span class="text-info">fiberhome :</span><span class="text-warning">возвращает запись вида '1-3,4,5' в формате ['1-3', '4', '5'] </span></li>
+                        <li><span class="text-info">huawei :</span><span class="text-warning">возвращает запись вида '1-3,4,5' в формате ['1 to 3', '4', '5'] </span></li>
+                    </ol>
+
+            </ul>
+        </li>
+        <li><h4><span class="text-success">hostname</span></h4></li>
+        <li><h4><span class="text-success">snmp_location</span></h4></li>
+        <li><h4><span class="text-success">user_vlan</span></h4></li>
+        <li><h4><span class="text-success">mgmt_vlan</span></h4></li>
+        <li><h4><span class="text-success">mvlan</span></h4></li>
+        <li><h4><span class="text-success">op_description</span></h4></li>
+        <li>
+            <h4><span class="text-success">op_checkbox :</span></h4> содержит значение чекбокса (True или False). Применяется в if условиях.
+        </li>
+    </ul>
+    </div>
+    <div class="col-md-6">
+        <h2>Интерфейс админ-панели: </h2>
+        <span class="text-info">Вкладки админ панели представляют собой графическую оболочку управления таблицами БД конфигуратора и директориями приложения.</span>
+        <h3>таблицы: </h3>
+        <ul>
+            <li>
+                <h4><span class="text-success">Regions:</span></h4> агрегирует данные остальных таблиц. Используем при добавлении нового региона.
+
+            </li>
+            <li>
+                <h4><span class="text-success">Users:</span></h4> данные для авторизации пользователей. т.к доменная авториация не работает,  при необходимости добавляем имя пользователя и пароль (oas)
+            </li>
+            <li>
+                <h4><span class="text-success">Models:</span></h4> зависимости формата vendor:model.
+            </li>
+            <li>
+                <h4><span class="text-success">Recommendations:</span></h4> таблица с подсказками , которые опционально можно добавлять на html страницу через влкадку Region
+            </li>
+            <li>
+                <h4><span class="text-success">Accounting:</span></h4> Учет сгенерированных конфигов. Содержит информацию и заполненных полях, пользователе, времени, номере сущности Remedy. Работет поиск.
+            </li>
+        </ul>
+        <h3>директории: </h3>
+        <ul>
+            <li>
+                <h4><span class="text-danger">Config Files</span></h4> Готовые конфиги , при необходимости можно найти нужный.
+            </li>
+            <li>
+                <h4><span class="text-danger">Template Files</span></h4> Директории с шаблонами. Есть возможность редактирования/загрузки/удаления шаблонов.  <span class="text-warning">БУДЬТЕ ВНИМАТЕЛЬНЫ!</span>
+            </li>
+        </ul>
+
+    </div>
+</div>
+</div>
+
+{% endblock %}
+
+

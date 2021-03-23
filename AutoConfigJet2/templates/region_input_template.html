@@ -1,0 +1,161 @@
+<div class='container' style="background-color: rgba(255, 255, 255, 0.801);">
+  <div class='container'>
+    <!--MODAL-->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Verify your config!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div id="modalBody">
+
+              </div>
+              <div class="row justify-content-end m-4">
+              <div class="btn-group-toggle">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <!-- Кнопки пределать!-->
+            <a id= "download" href="">
+              <button type="button" class="btn btn-primary" id='configDownload'>Download file</button>
+            </a>
+{#            <button type="button" class="btn btn-primary" id='sendTftp'>Load to tftp</button>#}
+              </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--END MODAL-->
+
+    <!--VENDOR_MODEL CHOOSE-->
+    <div class="row mt-5">
+      <div class='col-md-7 mt-5'>
+        <form id='form' method="POST" action="">
+          {{ form.csrf_token }}
+          <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Vendor</span>
+            </div>
+            <select id="vendor" class="custom-select" name="vendor">
+              <option selected disabled hidden>-</option>>
+              {% for vendor in vendors %}
+              <option> {{ vendor }}</option>>
+              {% endfor %}
+            </select>
+
+          </div>
+          <div class="input-group mb-5">
+            <div class="input-group-prepend">
+              <span class="input-group-text">Model</span>
+            </div>
+            {{ form.model(class="custom-select", id="model") }}
+          </div>
+          <!--VENDOR_MODEL CHOOSE END-->
+
+          <!--INPUT FORMS-->
+        <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-default">MSK</span>
+            </div>
+            {{ form['msk'](class="form-control form-control-lg", id = 'msk') }}
+            <div class="valid-feedback">
+            </div>
+          </div>
+        <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-default">Hostname</span>
+            </div>
+            {{ form['hostname'](class="form-control form-control-lg", id = 'hostname') }}
+            <div class="valid-feedback">
+            </div>
+        </div>
+        <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-default">IP/Mask</span>
+            </div>
+            {{ form['ip_mask'](class="form-control form-control-lg", id = 'ip_mask') }}
+            <div class="valid-feedback">
+            </div>
+        </div>
+                <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-default">User vlan</span>
+            </div>
+                                {% if region_name == 'Пенза' %}
+                <button type="button" class="btn btn-info">
+                    ports <span class="badge badge-light" id="counter">0</span>
+                </button>
+            {%  endif %}
+            {{ form['user_vlan'](class="form-control form-control-lg", id = 'user_vlan') }}
+
+
+
+            <div class="valid-feedback">
+            </div>
+
+        </div>
+          {% for form_name,label_name in fields['fields'].items() %}
+          <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroup-sizing-default">{{ label_name }}</span>
+            </div>
+            {{ form[form_name](class="form-control form-control-lg", id = form_name) }}
+            <div class="valid-feedback">
+            </div>
+          </div>
+          {% endfor %}
+          <!--INPUT FORMS-->
+
+
+          <!--INPUT CHECKBOX FORM-->
+          {% for form_name,label_name in fields['check_box_input'].items() %}
+          <div class="input-group mb-4">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <input type="checkbox" aria-label="Checkbox for following text input" id={{ label_name[1] }}>
+              </div>
+              <span class="input-group-text"> {{  label_name[0] }}</span>
+            </div>
+            {{ form[form_name](class="form-control form-control-lg ", id = form_name, disabled=disabeld) }}
+            <div class="valid-feedback">
+            </div>
+          </div>
+          {% endfor %}
+        {% for form_name,label_name in fields['simple_check_box'].items() %}
+            <input id = '{{  form_name }}' name = '{{  form_name }}' type="checkbox"  data-toggle="toggle" data-on="{{ label_name[0] }}" data-off="no {{ label_name[0] }}"  data-onstyle="info">
+        {% endfor %}
+          <div class="form-group">
+              <input class="btn btn-outline-info mt-3" id='submit' name='submit' value='submit'>
+          </div>
+
+        </form>
+
+
+
+        <!--Памятка-->
+      </div>
+      <div class='col-md-5 mt-5'>
+        <div class="card text-dark mb-3" style="max-width: 100%; max-height: 100%;">
+
+          <div class="card-body">
+            <h5 class="card-title">{{ region_name }}</h5>
+            <p class="card-text">
+            <ul class="list-group">
+              {% for recommendation in recommendations %}
+                <li class="list-group-item">
+                    {{ recommendation }}
+                </li>
+              {% endfor %}
+            </ul>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
